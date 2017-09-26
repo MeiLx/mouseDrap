@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<title>鼠标拖拽效果</title>
+	<style type="text/css">
+		#item{width: 100px;height: 100px;background: red;position: absolute;cursor: move;}
+		.clearselect{
+			-moz-user-select: none; /*火狐*/
+    		-webkit-user-select: none; /*webkit浏览器*/
+    		-ms-user-select: none; /*IE10*/
+    		-khtml-user-select: none; /*早期浏览器*/
+    		user-select: none;
+		}
+	</style>
+
+</head>
+<body>
+	<h2>拖动滑块吧。实现页面可拖动元素</h2>
+	<div id="item" class="clearselect"></div>
+
+	<script type="text/javascript">
+		
+		function getId(id){return document.getElementById(id);}
+
+		// 获取页面可视区的宽度和高度
+		var pageW = document.documentElement.clientWidth,
+			pageH = document.documentElement.clientHeight;
+
+		// 获取移动元素的宽度和高度
+		var itemW = getId("item").offsetWidth,
+			itemH = getId("item").offsetHeight;
+
+		// 把将移动元素的位置居中
+		function beCenter(el){
+			el.style.top = (pageH - itemH)/2 + "px";
+			el.style.left = (pageW - itemW)/2 + "px";
+		}
+		beCenter(getId("item"));
+
+		// 声明几个变量，鼠标位置距离元素顶部和左边的距离，先赋值为0，还有一个变量来确定元素是否是可移动。
+		var distanceX = 0,
+			distanceY = 0,
+			isMoving = false;
+
+		// 为元素绑定鼠标按下事件，当鼠标点击选中元素时，计算鼠标位置和元素的相对距离，并使元素改变为可移动。
+		getId("item").onmousedown = function(e){
+
+			// 兼容ie浏览器
+			var e = e || window.event;
+
+			distanceX = e.pageX - getId("item").offsetLeft;
+			distanceY = e.pageY - getId("item").offsetTop;
+
+			isMoving = true;
+		}
+
+		// 鼠标移动事件，由于可能会出现移动过程中鼠标离开了元素，所以为页面绑定该事件
+		document.onmousemove = function(e){
+
+			var e = e || window.event;
+
+			// 移动的位置，鼠标的位置减去鼠标与元素左边和顶部的相对位置。
+			var moveX = e.pageX - distanceX;
+			var moveY = e.pageY - distanceY;
+
+			//判断移动的位置是否超出页面，是的话就不能移动。
+			// 移动的最大位置
+			var maxX = pageW - itemW;
+			var maxY = pageH - itemH;
+			
+			moveX = Math.min(maxX ,Math.max(0 ,moveX));
+			moveY = Math.min(maxY ,Math.max(0 ,moveY));
+			// 判断是否可移动
+			if(isMoving === true){
+
+				getId("item").style.top = moveY + "px";
+				getId("item").style.left = moveX + "px";
+			}
+
+
+		}
+
+		//松开鼠标后不再发生移动。之所以用document是希望无论是否在元素上松开均会触发，比如鼠标移到了可视区域外面松开。
+		document.onmouseup = function(){
+
+			isMoving = false;
+		}
+	</script>
+</body>
+</html>
